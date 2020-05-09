@@ -83,7 +83,7 @@ dependencies {
     implementation androidDependencies.support_v4
     implementation androidDependencies.design
 
-    implementation project(':gsyVideoPlayer')
+    implementation project(':gsyVideoPlayer-java')
 
     implementation dataDependencies.okhttpUtil
     implementation dataDependencies.okhttp

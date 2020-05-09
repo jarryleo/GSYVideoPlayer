@@ -7,5 +7,6 @@
     <string name="tips_not_wifi_cancel">停止播放</string>
     <string name="no_url">播放地址无效</string>
     <string name="jump_ad">跳过</string>
+    <string name="gsy_name">gsy_player</string>
 
 </resources>

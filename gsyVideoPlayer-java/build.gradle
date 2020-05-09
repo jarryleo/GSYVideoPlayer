@@ -36,14 +36,19 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation androidDependencies.appcompat_v7
 
-    def viewDependencies = rootProject.ext.viewDependencies
-    api viewDependencies.ijkplayer_java
-    api viewDependencies.ijkplayer_exo
-    api viewDependencies.transitionseverywhere
+    //def viewDependencies = rootProject.ext.viewDependencies
+    //api viewDependencies.ijkplayer_java
+    //api viewDependencies.ijkplayer_exo
+    //api viewDependencies.transitionseverywhere
     //api project(':gsyVideoPlayer-proxy_cache')
     //api project(':gsyVideoPlayer-base')
-    api "com.shuyu:gsyVideoPlayer-base:$gsyVideoVersion"
-    api "com.shuyu:gsyvideoplayer-androidvideocache:$gsyVideoVersion"
+    //api "com.shuyu:gsyVideoPlayer-base:$gsyVideoVersion"
+    //api "com.shuyu:gsyvideoplayer-androidvideocache:$gsyVideoVersion"
+    //api 'com.google.android.exoplayer:exoplayer:r1.5.11'
+    api 'com.andkulikov:transitionseverywhere:2.0.0-beta01'
+    api 'com.google.android.exoplayer:exoplayer:2.10.4'
+    api 'com.google.android.exoplayer:extension-rtmp:2.10.4'
+
 
 }
 
