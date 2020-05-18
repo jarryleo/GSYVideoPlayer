@@ -25,14 +25,14 @@ import tv.danmaku.ijk.media.player.IjkLibLoader;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 /**
- IJKPLayer
- Created by guoshuyu on 2018/1/11.
+ * IJKPLayer
+ * Created by guoshuyu on 2018/1/11.
  */
 
 public class IjkPlayerManager extends BasePlayerManager {
 
     /**
-     log level
+     * log level
      */
     private static int logLevel = IjkMediaPlayer.IJK_LOG_DEFAULT;
 
@@ -73,20 +73,31 @@ public class IjkPlayerManager extends BasePlayerManager {
                 mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec-auto-rotate", 1);
                 mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec-handle-resolution-change", 1);
             }
+            //关闭自带缓存
+            mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "packet-buffering", 0);
+            //修复android的seek问题
+            mediaPlayer.setAndroidIOCallback(new FileAndroidIO());
+            mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT,
+                    "protocol_whitelist",
+                    "ijkio,crypto,file,http,https,tcp,tls,udp");
 
             if (gsyModel.isCache() && cacheManager != null) {
                 cacheManager.doCacheLogic(context, mediaPlayer, url, gsyModel.getMapHeadData(), gsyModel.getCachePath());
             } else {
+                Uri uri = Uri.parse(url);
+                //修复android的seek问题，Uri增加协议头
+                uri = Uri.parse("ijkio:androidio:" + uri.toString());
+                Debuger.printfLog("uriWrapper -> ijkio:androidio:");
+
                 if (!TextUtils.isEmpty(url)) {
-                    Uri uri = Uri.parse(url);
                     if (uri.getScheme().equals(ContentResolver.SCHEME_ANDROID_RESOURCE)) {
                         RawDataSourceProvider rawDataSourceProvider = RawDataSourceProvider.create(context, uri);
                         mediaPlayer.setDataSource(rawDataSourceProvider);
                     } else {
-                        mediaPlayer.setDataSource(url, gsyModel.getMapHeadData());
+                        mediaPlayer.setDataSource(context, uri, gsyModel.getMapHeadData());
                     }
                 } else {
-                    mediaPlayer.setDataSource(url, gsyModel.getMapHeadData());
+                    mediaPlayer.setDataSource(context, uri, gsyModel.getMapHeadData());
                 }
             }
 
@@ -94,7 +105,7 @@ public class IjkPlayerManager extends BasePlayerManager {
             if (gsyModel.getSpeed() != 1 && gsyModel.getSpeed() > 0) {
                 mediaPlayer.setSpeed(gsyModel.getSpeed());
             }
-            mediaPlayer.native_setLogLevel(logLevel);
+            IjkMediaPlayer.native_setLogLevel(logLevel);
             initIJKOption(mediaPlayer, optionModelList);
         } catch (IOException e) {
             e.printStackTrace();

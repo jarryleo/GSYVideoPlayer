@@ -8,6 +8,7 @@ import com.danikula.videocache.CacheListener;
 import com.danikula.videocache.HttpProxyCacheServer;
 import com.danikula.videocache.file.Md5FileNameGenerator;
 import com.shuyu.gsyvideoplayer.utils.CommonUtil;
+import com.shuyu.gsyvideoplayer.utils.Debuger;
 import com.shuyu.gsyvideoplayer.utils.FileUtils;
 import com.shuyu.gsyvideoplayer.utils.StorageUtils;
 
@@ -18,8 +19,8 @@ import java.util.Map;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 
 /**
- 代理缓存管理器
- Created by guoshuyu on 2018/5/18.
+ * 代理缓存管理器
+ * Created by guoshuyu on 2018/5/18.
  */
 
 public class ProxyCacheManager implements ICacheManager, CacheListener {
@@ -39,7 +40,7 @@ public class ProxyCacheManager implements ICacheManager, CacheListener {
     protected ProxyCacheUserAgentHeadersInjector userAgentHeadersInjector = new ProxyCacheUserAgentHeadersInjector();
 
     /**
-     单例管理器
+     * 单例管理器
      */
     public static synchronized ProxyCacheManager instance() {
         if (proxyCacheManager == null) {
@@ -79,7 +80,11 @@ public class ProxyCacheManager implements ICacheManager, CacheListener {
             mCacheFile = true;
         }
         try {
-            mediaPlayer.setDataSource(context, Uri.parse(url), header);
+            //修复android的seek问题，Uri增加协议头
+            Uri uri = Uri.parse(url);
+            uri = Uri.parse("ijkio:androidio:" + uri.toString());
+            Debuger.printfLog("uriWrapper -> ijkio:androidio:");
+            mediaPlayer.setDataSource(context, uri, header);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -146,7 +151,7 @@ public class ProxyCacheManager implements ICacheManager, CacheListener {
     }
 
     /**
-     创建缓存代理服务,带文件目录的.
+     * 创建缓存代理服务,带文件目录的.
      */
     public HttpProxyCacheServer newProxy(Context context, File file) {
         if (!file.exists()) {
@@ -164,7 +169,7 @@ public class ProxyCacheManager implements ICacheManager, CacheListener {
     }
 
     /**
-     创建缓存代理服务
+     * 创建缓存代理服务
      */
     public HttpProxyCacheServer newProxy(Context context) {
         return new HttpProxyCacheServer.Builder(context.getApplicationContext())
@@ -173,7 +178,7 @@ public class ProxyCacheManager implements ICacheManager, CacheListener {
 
 
     /**
-     获取缓存代理服务
+     * 获取缓存代理服务
      */
     protected static HttpProxyCacheServer getProxy(Context context) {
         HttpProxyCacheServer proxy = ProxyCacheManager.instance().proxy;
@@ -183,7 +188,7 @@ public class ProxyCacheManager implements ICacheManager, CacheListener {
 
 
     /**
-     获取缓存代理服务,带文件目录的
+     * 获取缓存代理服务,带文件目录的
      */
     public static HttpProxyCacheServer getProxy(Context context, File file) {
 

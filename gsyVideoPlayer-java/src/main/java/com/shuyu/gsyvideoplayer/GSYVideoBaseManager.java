@@ -5,11 +5,11 @@ import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-
-import androidx.annotation.Nullable;
-
 import android.text.TextUtils;
 import android.view.Surface;
+
+import androidx.annotation.CallSuper;
+import androidx.annotation.Nullable;
 
 import com.shuyu.gsyvideoplayer.cache.CacheFactory;
 import com.shuyu.gsyvideoplayer.cache.ICacheManager;
@@ -31,9 +31,9 @@ import java.util.Map;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 
 /**
- 基类管理器
- GSYVideoViewBridge接口说明可以查阅GSYVideoViewBridge类
- Created by guoshuyu on 2018/1/25.
+ * 基类管理器
+ * GSYVideoViewBridge接口说明可以查阅GSYVideoViewBridge类
+ * Created by guoshuyu on 2018/1/25.
  */
 
 public abstract class GSYVideoBaseManager implements IMediaPlayer.OnPreparedListener, IMediaPlayer.OnCompletionListener,
@@ -65,77 +65,77 @@ public abstract class GSYVideoBaseManager implements IMediaPlayer.OnPreparedList
     protected IPlayerInitSuccessListener mPlayerInitSuccessListener;
 
     /**
-     配置ijk option
+     * 配置ijk option
      */
     protected List<VideoOptionModel> optionModelList;
 
     /**
-     播放的tag，防止错位置，因为普通的url也可能重复
+     * 播放的tag，防止错位置，因为普通的url也可能重复
      */
     protected String playTag = "";
 
     /**
-     播放内核管理
+     * 播放内核管理
      */
     protected IPlayerManager playerManager;
 
     /**
-     缓存管理
+     * 缓存管理
      */
     protected ICacheManager cacheManager;
 
     /**
-     当前播放的视频宽的高
+     * 当前播放的视频宽的高
      */
     protected int currentVideoWidth = 0;
 
     /**
-     当前播放的视屏的高
+     * 当前播放的视屏的高
      */
     protected int currentVideoHeight = 0;
 
     /**
-     当前视频的最后状态
+     * 当前视频的最后状态
      */
     protected int lastState;
 
     /**
-     播放的tag，防止错位置，因为普通的url也可能重复
+     * 播放的tag，防止错位置，因为普通的url也可能重复
      */
     protected int playPosition = -22;
 
     /**
-     缓冲比例
+     * 缓冲比例
      */
     protected int bufferPoint;
 
     /**
-     播放超时
+     * 播放超时
      */
     protected int timeOut = 8 * 1000;
 
     /**
-     是否需要静音
+     * 是否需要静音
      */
     protected boolean needMute = false;
 
     /**
-     是否需要外部超时判断
+     * 是否需要外部超时判断
      */
     protected boolean needTimeOutOther;
 
     /**
-     删除默认所有缓存文件
+     * 删除默认所有缓存文件
      */
     public void clearAllDefaultCache(Context context) {
         clearDefaultCache(context, null, null);
     }
 
     /**
-     清除缓存
-
-     @param cacheDir 缓存目录，为空是使用默认目录
-     @param url      指定url缓存，为空时清除所有
+     * 清除缓存
+     *
+     * @param cacheDir 缓存目录，为空是使用默认目录
+     * @param url      指定url缓存，为空时清除所有
      */
     public void clearDefaultCache(Context context, @Nullable File cacheDir, @Nullable String url) {
         if (cacheManager != null) {
@@ -406,8 +406,8 @@ public abstract class GSYVideoBaseManager implements IMediaPlayer.OnPreparedList
     }
 
     /**
-     这里只是用于点击时判断是否已经缓存
-     所以每次直接通过一个CacheManager对象判断即可
+     * 这里只是用于点击时判断是否已经缓存
+     * 所以每次直接通过一个CacheManager对象判断即可
      */
     @Override
     public boolean cachePreview(Context context, File cacheDir, String url) {
@@ -587,7 +587,8 @@ public abstract class GSYVideoBaseManager implements IMediaPlayer.OnPreparedList
 
     }
 
-    private void initVideo(Message msg) {
+    @CallSuper
+    protected void initVideo(Message msg) {
         try {
             currentVideoWidth = 0;
             currentVideoHeight = 0;
@@ -625,7 +626,7 @@ public abstract class GSYVideoBaseManager implements IMediaPlayer.OnPreparedList
 
 
     /**
-     启动十秒的定时器进行 缓存操作
+     * 启动十秒的定时器进行 缓存操作
      */
     protected void startTimeOutBuffer() {
         // 启动定时
@@ -635,7 +636,7 @@ public abstract class GSYVideoBaseManager implements IMediaPlayer.OnPreparedList
     }
 
     /**
-     取消 十秒的定时器进行 缓存操作
+     * 取消 十秒的定时器进行 缓存操作
      */
     protected void cancelTimeOutBuffer() {
         Debuger.printfError("cancelTimeOutBuffer");
@@ -664,7 +665,7 @@ public abstract class GSYVideoBaseManager implements IMediaPlayer.OnPreparedList
     }
 
     /**
-     后面再修改设计模式吧，现在先用着
+     * 后面再修改设计模式吧，现在先用着
      */
     private void showDisplay(Message msg) {
         if (playerManager != null) {
@@ -677,9 +678,9 @@ public abstract class GSYVideoBaseManager implements IMediaPlayer.OnPreparedList
     }
 
     /**
-     打开raw播放支持
-
-     @param context
+     * 打开raw播放支持
+     *
+     * @param context
      */
     public void enableRawPlay(Context context) {
         this.context = context.getApplicationContext();
@@ -690,7 +691,7 @@ public abstract class GSYVideoBaseManager implements IMediaPlayer.OnPreparedList
     }
 
     /**
-     设置IJK视频的option
+     * 设置IJK视频的option
      */
     public void setOptionModelList(List<VideoOptionModel> optionModelList) {
         this.optionModelList = optionModelList;
@@ -701,7 +702,7 @@ public abstract class GSYVideoBaseManager implements IMediaPlayer.OnPreparedList
     }
 
     /**
-     是否需要静音
+     * 是否需要静音
      */
     public void setNeedMute(boolean needMute) {
         this.needMute = needMute;
@@ -719,22 +720,22 @@ public abstract class GSYVideoBaseManager implements IMediaPlayer.OnPreparedList
     }
 
     /**
-     是否需要在buffer缓冲时，增加外部超时判断
-     <p>
-     超时后会走onError接口，播放器通过onPlayError回调出
-     <p>
-     错误码为 ： BUFFER_TIME_OUT_ERROR = -192
-     <p>
-     由于onError之后执行GSYVideoPlayer的OnError，如果不想触发错误，
-     可以重载onError，在super之前拦截处理。
-     <p>
-     public void onError(int what, int extra){
-     do you want before super and return;
-     super.onError(what, extra)
-     }
-
-     @param timeOut          超时时间，毫秒 默认8000
-     @param needTimeOutOther 是否需要延时设置，默认关闭
+     * 是否需要在buffer缓冲时，增加外部超时判断
+     * <p>
+     * 超时后会走onError接口，播放器通过onPlayError回调出
+     * <p>
+     * 错误码为 ： BUFFER_TIME_OUT_ERROR = -192
+     * <p>
+     * 由于onError之后执行GSYVideoPlayer的OnError，如果不想触发错误，
+     * 可以重载onError，在super之前拦截处理。
+     * <p>
+     * public void onError(int what, int extra){
+     * do you want before super and return;
+     * super.onError(what, extra)
+     * }
+     *
+     * @param timeOut          超时时间，毫秒 默认8000
+     * @param needTimeOutOther 是否需要延时设置，默认关闭
      */
     public void setTimeOut(int timeOut, boolean needTimeOutOther) {
         this.timeOut = timeOut;
@@ -754,7 +755,7 @@ public abstract class GSYVideoBaseManager implements IMediaPlayer.OnPreparedList
     }
 
     /**
-     播放器初始化后接口
+     * 播放器初始化后接口
      */
     public void setPlayerInitSuccessListener(IPlayerInitSuccessListener listener) {
         this.mPlayerInitSuccessListener = listener;
