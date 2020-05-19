@@ -212,5 +212,4 @@ public interface IMediaPlayer {
      * AndroidMediaPlayer: M:
      */
     void setDataSource(IMediaDataSource mediaDataSource);
-
 }

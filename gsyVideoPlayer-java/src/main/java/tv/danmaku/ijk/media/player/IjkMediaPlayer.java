@@ -108,7 +108,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     public static final int PROP_FLOAT_VIDEO_DECODE_FRAMES_PER_SECOND       = 10001;
     public static final int PROP_FLOAT_VIDEO_OUTPUT_FRAMES_PER_SECOND       = 10002;
     public static final int FFP_PROP_FLOAT_PLAYBACK_RATE                    = 10003;
-    public static final int FFP_PROP_FLOAT_PITCH_RATE                       = 11000;
     public static final int FFP_PROP_FLOAT_DROP_FRAME_RATE                  = 10007;
 
     public static final int FFP_PROP_INT64_SELECTED_VIDEO_STREAM            = 20001;
@@ -141,8 +140,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     public static final int FFP_PROP_INT64_TCP_SPEED                        = 20200;
     public static final int FFP_PROP_INT64_LATEST_SEEK_LOAD_DURATION        = 20300;
     public static final int FFP_PROP_INT64_IMMEDIATE_RECONNECT              = 20211;
-    public static final int FFP_PROP_INT64_CHANNEL_CONFIG                   = 21000;
-
     //----------------------------------------
 
     @AccessedByNative
@@ -159,7 +156,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     @AccessedByNative
     private int mListenerContext;
 
-    private SurfaceHolder mSurfaceHolder[] = new SurfaceHolder[2];
+    private SurfaceHolder mSurfaceHolder;
     private EventHandler mEventHandler;
     private PowerManager.WakeLock mWakeLock = null;
     private boolean mScreenOnWhilePlaying;
@@ -169,7 +166,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     private int mVideoHeight;
     private int mVideoSarNum;
     private int mVideoSarDen;
-    private int mSurfaceIndex = 0;
+
     private String mDataSource;
 
     /**
@@ -257,12 +254,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
      * Update the IjkMediaPlayer SurfaceTexture. Call after setting a new
      * display surface.
      */
-    private native void _setVideoSurface(Surface surface,int index);
-
-
-    public void setSurfaceIndex(int idx) {
-        mSurfaceIndex = idx;
-    }
+    private native void _setVideoSurface(Surface surface);
 
     /**
      * Sets the {@link SurfaceHolder} to use for displaying the video portion of
@@ -279,17 +271,16 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
      */
     @Override
     public void setDisplay(SurfaceHolder sh) {
-        mSurfaceHolder[mSurfaceIndex] = sh;
+        mSurfaceHolder = sh;
         Surface surface;
         if (sh != null) {
             surface = sh.getSurface();
         } else {
             surface = null;
         }
-        _setVideoSurface(surface,mSurfaceIndex);
+        _setVideoSurface(surface);
         updateSurfaceScreenOn();
     }
-
 
     /**
      * Sets the {@link Surface} to be used as the sink for the video portion of
@@ -316,8 +307,8 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
             DebugLog.w(TAG,
                     "setScreenOnWhilePlaying(true) is ineffective for Surface");
         }
-        mSurfaceHolder[mSurfaceIndex] = null;
-        _setVideoSurface(surface,mSurfaceIndex);
+        mSurfaceHolder = null;
+        _setVideoSurface(surface);
         updateSurfaceScreenOn();
     }
 
@@ -497,7 +488,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         _setDataSource(mediaDataSource);
     }
 
-
     public void setAndroidIOCallback(IAndroidIO androidIO)
             throws IllegalArgumentException, SecurityException, IllegalStateException {
         _setAndroidIOCallback(androidIO);
@@ -576,7 +566,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     @Override
     public void setScreenOnWhilePlaying(boolean screenOn) {
         if (mScreenOnWhilePlaying != screenOn) {
-            if (screenOn && mSurfaceHolder[0] == null && mSurfaceHolder[1] == null) {
+            if (screenOn && mSurfaceHolder == null) {
                 DebugLog.w(TAG,
                         "setScreenOnWhilePlaying(true) is ineffective without a SurfaceHolder");
             }
@@ -599,11 +589,8 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     }
 
     private void updateSurfaceScreenOn() {
-        if (mSurfaceHolder[0] != null) {
-            mSurfaceHolder[0].setKeepScreenOn(mScreenOnWhilePlaying && mStayAwake);
-        }
-        if (mSurfaceHolder[1] != null) {
-            mSurfaceHolder[1].setKeepScreenOn(mScreenOnWhilePlaying && mStayAwake);
+        if (mSurfaceHolder != null) {
+            mSurfaceHolder.setKeepScreenOn(mScreenOnWhilePlaying && mStayAwake);
         }
     }
 
@@ -767,15 +754,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         return _getPropertyFloat(FFP_PROP_FLOAT_PLAYBACK_RATE, .0f);
     }
 
-    public void setPitch(float pitch) {
-        _setPropertyFloat(FFP_PROP_FLOAT_PITCH_RATE, pitch);
-    }
-
-    public float getPitch(float pitch) {
-        return _getPropertyFloat(FFP_PROP_FLOAT_PITCH_RATE, .0f);
-    }
-
-
     public int getVideoDecoder() {
         return (int)_getPropertyLong(FFP_PROP_INT64_VIDEO_DECODER, FFP_PROPV_DECODER_UNKNOWN);
     }
@@ -786,14 +764,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
 
     public float getVideoDecodeFramesPerSecond() {
         return _getPropertyFloat(PROP_FLOAT_VIDEO_DECODE_FRAMES_PER_SECOND, 0.0f);
-    }
-
-    public void setChannelConfig(int config) {
-        _setPropertyLong(FFP_PROP_INT64_CHANNEL_CONFIG, config);
-    }
-
-    public float getChannelConfig() {
-        return _getPropertyLong(FFP_PROP_INT64_CHANNEL_CONFIG, 0);
     }
 
     public long getVideoCachedDuration() {
